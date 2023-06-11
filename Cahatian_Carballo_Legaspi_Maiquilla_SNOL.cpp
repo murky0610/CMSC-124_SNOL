@@ -79,24 +79,6 @@ void beg_command(string key_val, unordered_map<string, string>& map, string& err
   	}
 }
 
-// Function to check the type of a given user input command
-int command_check(string user_input) {
-	if (user_input.substr(0, 3) == "BEG") {
-		// Check if the command starts with "BEG"
-    	return 1;
-	}
-	if (user_input.substr(0, 5) == "PRINT") {
-    	// Check if the command starts with "PRINT"
-    	return 2;
-  	} else if (user_input.find("BEG") != std::string::npos || user_input.find("PRINT") != std::string::npos) {
-    	// Check if the command contains "BEG" or "PRINT" anywhere in the string
-    	return 0;
- 	} else {
-    	// If none of the conditions above match, the command is unknown
-    	return 3;
-  	}
-}
-
 // Function to evaluate an ARITHMETIC OPERATIONS between two integers
 int evaluate_int(char op, int first, int sec) {
 	if (op == '+') return (sec + first); // Addition operation
@@ -116,6 +98,8 @@ string eval_post_int(string num) {
 	int first;
 	int sec;
 	int value;
+
+	bool negative = false;
 
   	for (i = 0; i < num.length(); i++) {
 	  	if (num[i] == ' ') {
@@ -273,15 +257,36 @@ string evaluate(string num) {
 	
   	num.erase(remove(num.begin(), num.end(), ' '), num.end()); // Removes whitespace from the input expression
 	  
-	for (i = 0; i < num.length(); i++) {
-    	if (num[i] != '-') {
-      		continue;
-    	}
-    	// Checks if the '-' character indicates a negative number
-    	if (i == 0 || num[i - 1] == '(' || (op_hierarchy(num[i - 1]) != -1)) {
-      		num[i] = '~'; // Replaces '-' with '~' to represent negative numbers
-    	}
-  	}
+		for (i = 0; i < num.length(); i++) {
+			if (num[i] == '-') {
+				cout <<"this is before shit2"<<endl;	
+				cout << num[i];
+			// Checks if the '-' character indicates a negative number
+			// if (i == 0 || num[i - 1] == '(' || (op_hierarchy(num[i - 1]) != -1)&& isdigit(num[i + 1])) {
+			// 	num[i] = '~'; // Replaces '-' with '~' to represent negative numbers
+				
+			// }
+				//  if(i == 0 && isdigit(num[i + 1])) {
+				// 	num[i] = '~';
+				// 	cout <<"this is shit1"<<endl;	
+				// 	cout << num[i];
+				// }
+				// if(num[0] == '-' && isdigit(num[i + 1])) {
+				// 	num[i] = '~';
+				// 	cout <<"this is shit1"<<endl;	
+				// 	cout << num[i];
+				// }
+				if(i == 0 && isdigit(num[i + 1]) || op_hierarchy(num[i - 1]) != -1 || num[i - 1] == '('){
+						num[i] = '~';
+						cout <<"this is shit2"<< num[i]<<endl;	
+				}
+				
+				
+			
+			}
+			
+		}
+
 
   	for (i = 0; i < num.length(); i++) {
     	if (isdigit(num[i]) || num[i] == '.') { // If the character is a digit or decimal point
@@ -648,6 +653,36 @@ string evaluate_math(string user_input, unordered_map <string, string> map, stri
   	return result;
 }
 
+// Function to check the type of a given user input command
+int command_check(string user_input) {
+		if (user_input.substr(0, 3) == "BEG") {// Check if the command starts with "BEG"
+			if(user_input[3] == ' '){
+				return 1;
+			}
+			else {
+				return 0;
+			}
+		
+		}
+		else if (user_input.substr(0, 5) == "PRINT") { // Check if the command starts with "PRINT"
+			//if(user_input.substr(0, 6) == " "){
+			if(user_input[5] == ' '){
+				return 2;
+			}
+			else {
+				return 0;
+			}
+		
+		} else if (user_input.find("BEG") != std::string::npos || user_input.find("PRINT") != std::string::npos) { // Check if the command contains "BEG" or "PRINT" anywhere in the string
+			
+			return 0;
+		} else { // If none of the conditions above match, the command is unknown
+			
+			return 3;
+		}
+}
+
+
 // This is the entry point of the program. It defines the main function.
 int main(){
 	// Declare several variables used in the program
@@ -693,7 +728,6 @@ int main(){
       }
       continue;
     }
-	
 	int command = command_check(user); // checks the user's command type
     if (user == "EXIT!") { // checks if the user wants to exit by entering "EXIT!"
 		cout << "\n\nInterpreter is now terminated..." << endl;
@@ -702,10 +736,11 @@ int main(){
 		error_check = "Unknown command! Does not match any valid command of the language.\n";
 		cout << "SNOL> " << error_check; // prints the error message to the console
     } else if (command == 1) { // handles the case where the command type is 1, indicating a "BEG" command
-		key_val = user.substr(4, user.length());
-		if (variable_check(key_val)) { // extracts the key value from the user input
-			beg_command(key_val, map, error_check); // calls the beg_command function to perform the corresponding action
-      	}
+			key_val = user.substr(4, user.length());
+			if (variable_check(key_val)) { // extracts the key value from the user input
+				beg_command(key_val, map, error_check); // calls the beg_command function to perform the corresponding action
+			}
+		
     } else if (command == 2) { // handles the case where the command type is 2, indicating a "PRINT" command
 		key_val = user.substr(6, user.length()); // extracts the value string from the user input 
 		eval = evaluate_number(key_val); // evaluates the type of value
